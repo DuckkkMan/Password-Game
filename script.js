@@ -1,300 +1,133 @@
 const $ = (id) => document.getElementById(id);
-const DB_KEY = "passcode_portal_accounts_v1";
+const STORAGE_KEY = "northstar_portal_accounts_v1";
+let extraAccounts = [];
 
-let mode = "signup";
-let activeUser = null;
-let stage = 1;
-let gameTimer = null;
-let gameRunning = false;
-let score = 0;
-let remaining = 30;
-let target = { x: 300, y: 200, r: 22 };
+$("year").textContent = new Date().getFullYear();
 
-const requirements = {
-  2: [
-    { text: "Pelo menos 8 caracteres", test: value => value.length >= 8 },
-    { text: "Uma letra maiúscula", test: value => /[A-Z]/.test(value) },
-    { text: "Pelo menos um número", test: value => /[0-9]/.test(value) }
-  ],
-  3: [
-    { text: "Pelo menos 12 caracteres", test: value => value.length >= 12 },
-    { text: "Duas letras maiúsculas", test: value => (value.match(/[A-Z]/g) || []).length >= 2 },
-    { text: "Dois números ou mais", test: value => (value.match(/[0-9]/g) || []).length >= 2 },
-    { text: "Um símbolo especial", test: value => /[^A-Za-z0-9]/.test(value) },
-    { text: "Sem espaços", test: value => !/\s/.test(value) }
-  ]
-};
-
-function readDB() {
-  try { return JSON.parse(localStorage.getItem(DB_KEY) || "{}"); }
-  catch { return {}; }
+function readLocalAccounts() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    return data && typeof data === "object" ? data : {};
+  } catch {
+    return {};
+  }
 }
 
-function writeDB(database) {
-  localStorage.setItem(DB_KEY, JSON.stringify(database));
+function saveLocalAccounts(accounts) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
 }
 
-async function hash(value) {
-  const bytes = new TextEncoder().encode(value);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+async function loadExtraAccounts() {
+  try {
+    const response = await fetch("senhas.json", { cache: "no-store" });
+    if (!response.ok) throw new Error("Não foi possível carregar senhas.json");
+    const data = await response.json();
+    extraAccounts = Array.isArray(data.accounts) ? data.accounts : [];
+  } catch {
+    extraAccounts = [];
+    console.info("senhas.json não foi carregado. O cadastro local continua funcionando.");
+  }
 }
 
-function showPanel(panelId) {
-  ["authPanel", "stagePanel", "finalPanel"].forEach(id => {
-    $(id).classList.toggle("hidden", id !== panelId);
-  });
+function setMode(mode) {
+  const signup = mode === "signup";
+  $("signupForm").classList.toggle("hidden", !signup);
+  $("loginForm").classList.toggle("hidden", signup);
+  $("signupTab").classList.toggle("active", signup);
+  $("loginTab").classList.toggle("active", !signup);
+  $("signupTab").setAttribute("aria-selected", String(signup));
+  $("loginTab").setAttribute("aria-selected", String(!signup));
+  $("formEyebrow").textContent = signup ? "COMECE POR AQUI" : "BEM-VINDO DE VOLTA";
+  $("formTitle").textContent = signup ? "Criar sua conta" : "Entrar no portal";
+  $("formDescription").textContent = signup
+    ? "Preencha seus dados para fazer seu cadastro."
+    : "Informe seu usuário e sua senha para acessar.";
+  $("feedback").textContent = "";
+  $("feedback").classList.remove("good");
 }
 
-function setMessage(id, message, good = false) {
-  $(id).textContent = message;
-  $(id).classList.toggle("good", good);
+function showSuccess() {
+  $("authCard").classList.add("hidden");
+  $("successCard").classList.remove("hidden");
 }
 
-function setMode(nextMode) {
-  mode = nextMode;
-  $("signupTab").classList.toggle("active", mode === "signup");
-  $("loginTab").classList.toggle("active", mode === "login");
-  $("authButton").textContent = mode === "signup" ? "INICIALIZAR CONTA →" : "AUTENTICAR →";
-  $("mainPassword").autocomplete = mode === "signup" ? "new-password" : "current-password";
-  $("authMessage").textContent = "";
+function showAuth(mode = "login") {
+  $("successCard").classList.add("hidden");
+  $("authCard").classList.remove("hidden");
+  setMode(mode);
 }
 
 $("signupTab").addEventListener("click", () => setMode("signup"));
 $("loginTab").addEventListener("click", () => setMode("login"));
+$("goLogin").addEventListener("click", () => {
+  $("loginForm").reset();
+  showAuth("login");
+  $("loginUsername").focus();
+});
 
-$("authForm").addEventListener("submit", async event => {
+$("signupForm").addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const username = $("username").value.trim();
-  const password = $("mainPassword").value;
+  const name = $("fullName").value.trim();
+  const email = $("email").value.trim().toLowerCase();
+  const username = $("signupUsername").value.trim();
+  const password = $("signupPassword").value;
+  const confirmation = $("confirmPassword").value;
 
-  if (!/^[a-zA-Z0-9_-]{3,20}$/.test(username)) {
-    setMessage("authMessage", "Use de 3 a 20 caracteres: letras, números, _ ou -.");
-    return;
-  }
-  if (password.length < 6) {
-    setMessage("authMessage", "A senha principal precisa ter pelo menos 6 caracteres.");
-    return;
-  }
+  if (name.length < 2) return showFeedback("Informe seu nome completo.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showFeedback("Digite um e-mail válido.");
+  if (!/^[a-zA-Z0-9_-]{3,20}$/.test(username)) return showFeedback("O usuário deve ter de 3 a 20 caracteres: letras, números, _ ou -.");
+  if (password.length < 6) return showFeedback("A senha precisa ter pelo menos 6 caracteres.");
+  if (password !== confirmation) return showFeedback("As senhas não são iguais.");
 
-  const database = readDB();
+  const accounts = readLocalAccounts();
   const key = username.toLowerCase();
-  const passwordHash = await hash(password);
+  const usernameInJson = extraAccounts.some(account =>
+    String(account.username || "").toLowerCase() === key
+  );
 
-  if (mode === "signup") {
-    if (database[key]) {
-      setMessage("authMessage", "Esse identificador já existe neste navegador.");
-      return;
-    }
-    database[key] = { username, main: passwordHash, keys: {}, completed: 0, best: 0 };
-    writeDB(database);
-    activeUser = key;
-    stage = 2;
-    openStage();
-    return;
+  if (accounts[key] || usernameInJson) {
+    return showFeedback("Esse nome de usuário já está cadastrado.");
   }
 
-  if (!database[key] || database[key].main !== passwordHash) {
-    setMessage("authMessage", "Identificador ou senha incorretos.");
-    return;
+  accounts[key] = { name, email, username, password };
+  try {
+    saveLocalAccounts(accounts);
+  } catch {
+    return showFeedback("Não foi possível salvar o cadastro neste navegador.");
   }
 
-  activeUser = key;
-  if (database[key].completed >= 3) {
-    openFinal();
-    return;
-  }
-  stage = Math.max(2, database[key].completed + 2);
-  openStage();
+  $("signupForm").reset();
+  showSuccess();
 });
 
-function openStage() {
-  const database = readDB();
-  const data = database[activeUser];
-  if (!data) {
-    showPanel("authPanel");
-    return;
-  }
-
-  showPanel("stagePanel");
-  $("currentUser").textContent = data.username;
-  $("stagePassword").value = "";
-  setMessage("stageMessage", "");
-  $("progressCount").textContent = String(stage).padStart(2, "0") + " / 03";
-  $("progressBar").style.width = (stage / 3 * 100) + "%";
-  $("stageTag").textContent = "CAMADA 0" + stage;
-  $("stageEyebrow").textContent = stage === 2 ? "Segunda camada" : "Terceira camada";
-  $("stageTitle").innerHTML = stage === 2
-    ? 'A segunda chave<span class="accent">.</span>'
-    : 'Última verificação<span class="accent">.</span>';
-  $("stageDescription").textContent = stage === 2
-    ? "Uma nova camada foi ativada. Crie uma senha que cumpra todos os requisitos."
-    : "Você chegou à última camada. Esta chave exige ainda mais atenção.";
-
-  renderRules("");
-}
-
-function renderRules(value) {
-  const list = requirements[stage] || [];
-  $("rules").innerHTML = list.map(rule =>
-    '<div class="rule ' + (rule.test(value) ? "ok" : "") + '">' +
-      '<span class="rule-dot"></span><span>' + rule.text + '</span></div>'
-  ).join("");
-  $("stageButton").disabled = !list.every(rule => rule.test(value));
-}
-
-$("stagePassword").addEventListener("input", event => {
-  renderRules(event.target.value);
-  setMessage("stageMessage", "");
-});
-
-$("stageForm").addEventListener("submit", async event => {
+$("loginForm").addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const value = $("stagePassword").value;
-  const list = requirements[stage];
-  if (!list.every(rule => rule.test(value))) return;
+  const username = $("loginUsername").value.trim();
+  const password = $("loginPassword").value;
+  const key = username.toLowerCase();
+  const localAccount = readLocalAccounts()[key];
 
-  const database = readDB();
-  const data = database[activeUser];
-  const passwordHash = await hash(value);
+  const localMatch = localAccount && localAccount.password === password;
+  const jsonMatch = extraAccounts.some(account =>
+    String(account.username || "").toLowerCase() === key &&
+    String(account.password ?? "") === password
+  );
 
-  if (Object.values(data.keys).includes(passwordHash)) {
-    setMessage("stageMessage", "Esta chave já foi usada em outra camada. Escolha outra.");
+  if (localMatch || jsonMatch) {
+    $("loginForm").reset();
+    showFeedback("Login realizado com sucesso!", true);
     return;
   }
 
-  data.keys["stage" + stage] = passwordHash;
-  data.completed = stage - 1;
-  writeDB(database);
-
-  if (stage === 2) {
-    stage = 3;
-    openStage();
-  } else {
-    data.completed = 3;
-    writeDB(database);
-    openFinal();
-  }
+  showFeedback("Usuário ou senha incorretos.");
 });
 
-function openFinal() {
-  showPanel("finalPanel");
-  const database = readDB();
-  $("best").textContent = database[activeUser]?.best || 0;
-  drawGame();
-  stopGame();
+function showFeedback(message, success = false) {
+  $("feedback").textContent = message;
+  $("feedback").classList.toggle("good", success);
 }
 
-function drawGame() {
-  const canvas = $("game");
-  const context = canvas.getContext("2d");
-
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.strokeStyle = "#142b3b";
-  context.lineWidth = 1;
-
-  for (let x = 0; x < canvas.width; x += 30) {
-    context.beginPath();
-    context.moveTo(x, 0);
-    context.lineTo(x, canvas.height);
-    context.stroke();
-  }
-  for (let y = 0; y < canvas.height; y += 30) {
-    context.beginPath();
-    context.moveTo(0, y);
-    context.lineTo(canvas.width, y);
-    context.stroke();
-  }
-
-  const glow = context.createRadialGradient(target.x, target.y, 2, target.x, target.y, target.r * 2.2);
-  glow.addColorStop(0, "#a9fff5");
-  glow.addColorStop(.35, "#5de4df");
-  glow.addColorStop(1, "#5de4df00");
-
-  context.fillStyle = glow;
-  context.beginPath();
-  context.arc(target.x, target.y, target.r * 2.2, 0, Math.PI * 2);
-  context.fill();
-
-  context.strokeStyle = "#a9fff5";
-  context.lineWidth = 2;
-  context.beginPath();
-  context.arc(target.x, target.y, target.r, 0, Math.PI * 2);
-  context.stroke();
-
-  context.fillStyle = "#dffffb";
-  context.beginPath();
-  context.arc(target.x, target.y, 4, 0, Math.PI * 2);
-  context.fill();
-}
-
-function moveTarget() {
-  target = {
-    x: 35 + Math.random() * 530,
-    y: 35 + Math.random() * 340,
-    r: 17 + Math.random() * 9
-  };
-  drawGame();
-}
-
-function stopGame() {
-  if (gameTimer) clearInterval(gameTimer);
-  gameTimer = null;
-  gameRunning = false;
-}
-
-function startGame() {
-  stopGame();
-  score = 0;
-  remaining = 30;
-  gameRunning = true;
-  $("score").textContent = score;
-  $("time").textContent = remaining;
-  moveTarget();
-
-  gameTimer = setInterval(() => {
-    remaining--;
-    $("time").textContent = remaining;
-
-    if (remaining <= 0) {
-      stopGame();
-      const database = readDB();
-      if (database[activeUser]) {
-        database[activeUser].best = Math.max(database[activeUser].best || 0, score);
-        writeDB(database);
-      }
-      $("best").textContent = database[activeUser]?.best || score;
-      drawGame();
-    }
-  }, 1000);
-}
-
-$("game").addEventListener("click", event => {
-  if (!gameRunning) return;
-
-  const rect = $("game").getBoundingClientRect();
-  const x = (event.clientX - rect.left) / rect.width * 600;
-  const y = (event.clientY - rect.top) / rect.height * 410;
-
-  if (Math.hypot(x - target.x, y - target.y) <= target.r + 8) {
-    score++;
-    $("score").textContent = score;
-    moveTarget();
-  }
-});
-
-$("playAgain").addEventListener("click", startGame);
-
-function logout() {
-  stopGame();
-  activeUser = null;
-  $("authForm").reset();
-  $("stageForm").reset();
-  setMode("login");
-  showPanel("authPanel");
-}
-
-$("logout").addEventListener("click", logout);
-$("logoutFinal").addEventListener("click", logout);
+loadExtraAccounts();
+setMode("signup");
