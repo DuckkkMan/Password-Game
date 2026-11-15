@@ -1,99 +1,108 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080b12">
-<title>PASSCODE // Acesso restrito</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-:root{color-scheme:dark;--bg:#080b12;--panel:#101722;--line:#243244;--muted:#8493a8;--text:#edf4ff;--cyan:#5de4df;--blue:#719cff;--red:#ff7185;--green:#80e6a4}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#18334a 0%,transparent 48%),radial-gradient(circle at 90% 85%,#102b32 0%,transparent 30%),var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;display:grid;place-items:center;padding:28px 16px}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(#26384a 1px,transparent 1px),linear-gradient(90deg,#26384a 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
-.shell{width:min(100%,520px);position:relative}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.brand{display:flex;align-items:center;gap:10px;font:500 12px 'DM Mono',monospace;letter-spacing:2px;color:#c9d8e9}.brand-mark{width:28px;height:28px;border:1px solid #3d6975;border-radius:8px;display:grid;place-items:center;color:var(--cyan);box-shadow:0 0 22px #5de4df20}.status{font:11px 'DM Mono',monospace;color:var(--green);letter-spacing:1px}.status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin:0 8px 1px 0;box-shadow:0 0 10px var(--green)}
-.panel{background:linear-gradient(145deg,#121c29f5,#0c121cf5);border:1px solid #26394b;border-radius:18px;padding:30px;box-shadow:0 28px 90px #0008,inset 0 1px #ffffff0b;position:relative;overflow:hidden}.panel:before{content:"";position:absolute;top:0;left:30px;right:30px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.6}
-.eyebrow{font:11px 'DM Mono',monospace;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;margin:0 0 12px}.title{font-size:clamp(27px,6vw,36px);line-height:1.1;letter-spacing:-1.4px;margin:0 0 10px}.sub{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 25px}
-.tabs{display:flex;gap:5px;background:#080e17;padding:5px;border:1px solid #223143;border-radius:10px;margin-bottom:24px}.tab{flex:1;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:7px;font:500 13px 'Space Grotesk';cursor:pointer}.tab.active{background:#1b2b3c;color:var(--text);box-shadow:inset 0 0 0 1px #35516a}
-.field{margin:0 0 17px}.field label{display:block;font:11px 'DM Mono',monospace;letter-spacing:1px;color:#a9b8ca;margin-bottom:8px;text-transform:uppercase}.input-wrap{position:relative}.field input{width:100%;background:#080e17;border:1px solid #2b3b4d;border-radius:9px;padding:14px 15px;color:var(--text);font:14px 'DM Mono',monospace;outline:none;transition:.2s}.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #5de4df17}.field input::placeholder{color:#506074}
-.btn{width:100%;border:0;border-radius:9px;padding:14px 16px;margin-top:6px;background:linear-gradient(100deg,#5de4df,#8ab8ff);color:#071219;font:700 14px 'Space Grotesk';cursor:pointer;transition:transform .15s,filter .15s}.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.message{min-height:20px;margin:13px 0 0;font:12px 'DM Mono',monospace;color:var(--red);line-height:1.5}.message.good{color:var(--green)}
-.progress-head{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}.progress-label{font:11px 'DM Mono',monospace;letter-spacing:1px;color:#aab9cb}.progress-count{font:11px 'DM Mono',monospace;color:var(--cyan)}.progress{height:5px;border-radius:9px;background:#263343;overflow:hidden;margin-bottom:27px}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:width .35s;box-shadow:0 0 14px #5de4df88}
-.challenge{padding:15px 16px;border:1px solid #26384b;border-radius:10px;background:#0a111b;margin:0 0 20px}.challenge-title{font:11px 'DM Mono',monospace;color:var(--cyan);letter-spacing:1px;margin-bottom:10px}.rule{display:flex;align-items:center;gap:9px;color:#a6b5c8;font-size:12px;margin:8px 0}.dot{width:7px;height:7px;border:1px solid #61758c;border-radius:50%;flex:none}.rule.ok{color:var(--green)}.rule.ok .dot{background:var(--green);border-color:var(--green);box-shadow:0 0 8px #80e6a477}
-.stage-tag{display:inline-flex;align-items:center;gap:7px;border:1px solid #315264;border-radius:20px;padding:6px 10px;color:var(--cyan);font:10px 'DM Mono',monospace;letter-spacing:1px;margin-bottom:14px}.stage-tag span{width:6px;height:6px;border-radius:50%;background:var(--cyan)}
-.terminal{font:12px 'DM Mono',monospace;color:#7f91a8;border-top:1px solid #243244;margin-top:23px;padding-top:14px;display:flex;justify-content:space-between;gap:10px}.terminal b{color:#b6c6d9;font-weight:400}
-.hidden{display:none!important}.game-wrap{text-align:center}.game-wrap canvas{width:100%;max-width:420px;aspect-ratio:1.45;background:#08111b;border:1px solid #2a4656;border-radius:12px;display:block;margin:18px auto 12px}.game-stats{display:flex;justify-content:space-between;font:11px 'DM Mono',monospace;color:var(--muted)}.small{font-size:11px;color:#728398;line-height:1.6;margin:16px 0 0}.logout{border:0;background:none;color:#8ea0b5;font:11px 'DM Mono',monospace;cursor:pointer;text-decoration:underline}
-@media(max-width:480px){.panel{padding:23px 19px}.top{margin-bottom:13px}.terminal{font-size:10px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070a12">
+  <meta name="description" content="Portal de autenticação PASSCODE.">
+  <title>PASSCODE // Acesso restrito</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
-<main class="shell">
- <header class="top"><div class="brand"><span class="brand-mark">⌁</span> PASSCODE<span style="color:#587087">//</span>PORTAL</div><div class="status">SYSTEM ONLINE</div></header>
- <section class="panel" id="authPanel">
-  <p class="eyebrow">Área de autenticação</p><h1 class="title">Acesso restrito<span style="color:var(--cyan)">.</span></h1>
-  <p class="sub">Crie suas credenciais ou retome uma sessão. Cada etapa exige uma nova combinação.</p>
-  <div class="tabs"><button class="tab active" id="signupTab">Criar conta</button><button class="tab" id="loginTab">Entrar</button></div>
-  <form id="authForm">
-   <div class="field"><label for="username">Identificador</label><input id="username" autocomplete="username" maxlength="20" placeholder="Seu nome de usuário" required></div>
-   <div class="field"><label for="mainPassword">Senha principal</label><input id="mainPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Digite sua senha" required></div>
-   <button class="btn" id="authButton">INICIALIZAR CONTA <span>→</span></button>
-  </form>
-  <p class="message" id="authMessage" aria-live="polite"></p>
-  <div class="terminal"><span>CONEXÃO <b>CRIPTOGRAFADA</b></span><span>PROTOCOLO <b>v1.0.4</b></span></div>
-  <p class="small">Projeto demonstrativo: os dados ficam somente neste navegador. Não use senhas reais ou reutilizadas.</p>
- </section>
- <section class="panel hidden" id="stagePanel">
-  <div class="progress-head"><span class="progress-label">VERIFICAÇÃO DE IDENTIDADE</span><span class="progress-count" id="progressCount">01 / 03</span></div>
-  <div class="progress"><span id="progressBar" style="width:33%"></span></div>
-  <div class="stage-tag"><span></span><b id="stageTag">CAMADA 01</b></div>
-  <p class="eyebrow" id="stageEyebrow">Primeira camada</p><h1 class="title" id="stageTitle">Defina sua chave<span style="color:var(--cyan)">.</span></h1>
-  <p class="sub" id="stageDescription">Sua primeira credencial foi aceita. Agora configure a próxima chave de acesso.</p>
-  <div class="challenge"><div class="challenge-title">REQUISITOS DA CHAVE</div><div id="rules"></div></div>
-  <form id="stageForm"><div class="field"><label for="stagePassword">Nova senha</label><input id="stagePassword" type="password" autocomplete="new-password" placeholder="Crie uma senha para esta camada" required></div><button class="btn" id="stageButton" disabled>VALIDAR CHAVE →</button></form>
-  <p class="message" id="stageMessage" aria-live="polite"></p>
-  <div class="terminal"><span>USUÁRIO <b id="currentUser">---</b></span><button class="logout" id="logout">ENCERRAR SESSÃO</button></div>
- </section>
- <section class="panel hidden game-wrap" id="finalPanel">
-  <p class="eyebrow">Verificação concluída</p><h1 class="title">Acesso concedido<span style="color:var(--cyan)">.</span></h1>
-  <p class="sub">Todas as camadas foram validadas. A sessão está liberada.</p>
-  <div class="stage-tag"><span></span> AMBIENTE DESBLOQUEADO</div>
-  <canvas id="game" width="600" height="410" aria-label="Área interativa"></canvas>
-  <div class="game-stats"><span>PONTOS: <b id="score">0</b></span><span>TEMPO: <b id="time">30</b>s</span><span>RECORDE: <b id="best">0</b></span></div>
-  <button class="btn" id="playAgain">INICIAR / JOGAR NOVAMENTE</button>
-  <div class="terminal"><span>SESSÃO <b>VERIFICADA</b></span><button class="logout" id="logoutFinal">SAIR</button></div>
- </section>
-</main>
-<script>
-const $=id=>document.getElementById(id);
-const DB_KEY='passcode_portal_accounts_v1';
-let mode='signup',activeUser=null,stage=1,gameTimer=null,gameRunning=false,score=0,remaining=30,target={x:300,y:200,r:22};
-const requirements={
-  2:[{text:'Pelo menos 8 caracteres',test:v=>v.length>=8},{text:'Uma letra maiúscula',test:v=>/[A-Z]/.test(v)},{text:'Pelo menos um número',test:v=>/[0-9]/.test(v)}],
-  3:[{text:'Pelo menos 12 caracteres',test:v=>v.length>=12},{text:'Duas letras maiúsculas',test:v=>(v.match(/[A-Z]/g)||[]).length>=2},{text:'Dois números ou mais',test:v=>(v.match(/[0-9]/g)||[]).length>=2},{text:'Um símbolo especial',test:v=>/[^A-Za-z0-9]/.test(v)},{text:'Sem espaços',test:v=>! /\s/.test(v)}]
-};
-function readDB(){try{return JSON.parse(localStorage.getItem(DB_KEY)||'{}')}catch{return {}}}
-function writeDB(db){localStorage.setItem(DB_KEY,JSON.stringify(db))}
-async function hash(value){const bytes=new TextEncoder().encode(value);const digest=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('')}
-function show(panel){['authPanel','stagePanel','finalPanel'].forEach(id=>$(id).classList.toggle('hidden',id!==panel))}
-function setMessage(id,text,good=false){$(id).textContent=text;$(id).classList.toggle('good',good)}
-function setMode(next){mode=next;$('signupTab').classList.toggle('active',mode==='signup');$('loginTab').classList.toggle('active',mode==='login');$('authButton').innerHTML=mode==='signup'?'INICIALIZAR CONTA →':'AUTENTICAR →';$('mainPassword').autocomplete=mode==='signup'?'new-password':'current-password';$('authMessage').textContent=''}
-$('signupTab').onclick=()=>setMode('signup');$('loginTab').onclick=()=>setMode('login');
-$('authForm').addEventListener('submit',async e=>{e.preventDefault();const username=$('username').value.trim();const password=$('mainPassword').value;if(!/^[a-zA-Z0-9_-]{3,20}$/.test(username)){setMessage('authMessage','Use de 3 a 20 caracteres: letras, números, _ ou -.');return}if(password.length<6){setMessage('authMessage','A senha principal precisa ter pelo menos 6 caracteres.');return}
- const db=readDB(),key=username.toLowerCase(),passHash=await hash(password);
- if(mode==='signup'){if(db[key]){setMessage('authMessage','Esse identificador já existe neste navegador.');return}db[key]={username,main:passHash,keys:{},completed:0,best:0};writeDB(db);activeUser=key;stage=2;openStage();return}
- if(!db[key]||db[key].main!==passHash){setMessage('authMessage','Identificador ou senha incorretos.');return}activeUser=key;if(db[key].completed>=3){openFinal();return}stage=Math.max(2,db[key].completed+2);openStage();
-});
-function openStage(){const data=readDB()[activeUser];if(!data){show('authPanel');return}show('stagePanel');$('currentUser').textContent=data.username;$('stagePassword').value='';setMessage('stageMessage','');$('progressCount').textContent=String(stage).padStart(2,'0')+' / 03';$('progressBar').style.width=(stage/3*100)+'%';$('stageTag').textContent='CAMADA 0'+stage;$('stageEyebrow').textContent=stage===2?'Segunda camada':'Terceira camada';$('stageTitle').innerHTML=stage===2?'A segunda chave<span style="color:var(--cyan)">.</span>':'Última verificação<span style="color:var(--cyan)">.</span>';$('stageDescription').textContent=stage===2?'Uma nova camada foi ativada. Crie uma senha que cumpra todos os requisitos.':'Você chegou à última camada. Esta chave exige ainda mais atenção.';renderRules('');}
-function renderRules(value){const list=requirements[stage]||[];$('rules').innerHTML=list.map(r=>'<div class="rule '+(r.test(value)?'ok':'')+'"><span class="dot"></span>'+r.text+'</div>').join('');$('stageButton').disabled=!list.every(r=>r.test(value))}
-$('stagePassword').addEventListener('input',e=>{renderRules(e.target.value);setMessage('stageMessage','')});
-$('stageForm').addEventListener('submit',async e=>{e.preventDefault();const value=$('stagePassword').value;const list=requirements[stage];if(!list.every(r=>r.test(value)))return;const db=readDB(),data=db[activeUser],h=await hash(value);if(Object.values(data.keys).includes(h)){setMessage('stageMessage','Esta chave já foi usada em outra camada. Escolha outra.');return}data.keys['stage'+stage]=h;data.completed=stage-1;writeDB(db);if(stage===2){stage=3;openStage()}else{data.completed=3;writeDB(db);openFinal()}});
-function openFinal(){show('finalPanel');const db=readDB();$('best').textContent=db[activeUser]?.best||0;drawGame();stopGame()}
-function drawGame(){const c=$('game'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.strokeStyle='#142b3b';ctx.lineWidth=1;for(let x=0;x<c.width;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,c.height);ctx.stroke()}for(let y=0;y<c.height;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(c.width,y);ctx.stroke()}const glow=ctx.createRadialGradient(target.x,target.y,2,target.x,target.y,target.r*2.2);glow.addColorStop(0,'#a9fff5');glow.addColorStop(.35,'#5de4df');glow.addColorStop(1,'#5de4df00');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(target.x,target.y,target.r*2.2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#a9fff5';ctx.lineWidth=2;ctx.beginPath();ctx.arc(target.x,target.y,target.r,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#dffffb';ctx.beginPath();ctx.arc(target.x,target.y,4,0,Math.PI*2);ctx.fill()}
-function moveTarget(){target={x:35+Math.random()*530,y:35+Math.random()*340,r:17+Math.random()*9};drawGame()}
-function stopGame(){if(gameTimer)clearInterval(gameTimer);gameTimer=null;gameRunning=false}
-function startGame(){stopGame();score=0;remaining=30;gameRunning=true;$('score').textContent=score;$('time').textContent=remaining;moveTarget();gameTimer=setInterval(()=>{remaining--;$('time').textContent=remaining;if(remaining<=0){stopGame();const db=readDB();if(db[activeUser]){db[activeUser].best=Math.max(db[activeUser].best||0,score);writeDB(db)}$('best').textContent=db[activeUser]?.best||score;drawGame()}},1000)}
-$('game').addEventListener('click',e=>{if(!gameRunning)return;const rect=$('game').getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width*600,y=(e.clientY-rect.top)/rect.height*410;if(Math.hypot(x-target.x,y-target.y)<=target.r+8){score++;$('score').textContent=score;moveTarget()}});
-$('playAgain').onclick=startGame;
-function logout(){stopGame();activeUser=null;$('authForm').reset();$('stageForm').reset();setMode('login');show('authPanel')}
-$('logout').onclick=logout;$('logoutFinal').onclick=logout;
-</script>
-</body></html>
+  <div class="ambient one"></div>
+  <div class="ambient two"></div>
+
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-icon">⌁</span>
+        <span>PASSCODE <span class="brand-slash">//</span> PORTAL</span>
+      </div>
+      <div class="system-status">SYSTEM ONLINE</div>
+    </header>
+
+    <section class="panel" id="authPanel">
+      <p class="eyebrow">Área de autenticação</p>
+      <h1>Acesso restrito<span class="accent">.</span></h1>
+      <p class="subtitle">Crie suas credenciais ou retome uma sessão. Cada etapa exige uma nova combinação.</p>
+
+      <div class="tabs">
+        <button class="tab active" id="signupTab" type="button">Criar conta</button>
+        <button class="tab" id="loginTab" type="button">Entrar</button>
+      </div>
+
+      <form id="authForm">
+        <div class="field">
+          <label for="username">Identificador</label>
+          <input id="username" autocomplete="username" maxlength="20" placeholder="Seu nome de usuário" required>
+        </div>
+        <div class="field">
+          <label for="mainPassword">Senha principal</label>
+          <input id="mainPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Digite sua senha" required>
+        </div>
+        <button class="primary-btn" id="authButton" type="submit">INICIALIZAR CONTA →</button>
+      </form>
+
+      <p class="message" id="authMessage" aria-live="polite"></p>
+      <div class="terminal">
+        <span>CONEXÃO <b>CRIPTOGRAFADA</b></span>
+        <span>PROTOCOLO <b>v1.0.4</b></span>
+      </div>
+      <p class="small-note">Projeto demonstrativo: os dados ficam somente neste navegador. Não use senhas reais ou reutilizadas.</p>
+    </section>
+
+    <section class="panel hidden" id="stagePanel">
+      <div class="progress-heading">
+        <span>VERIFICAÇÃO DE IDENTIDADE</span>
+        <span class="progress-count" id="progressCount">02 / 03</span>
+      </div>
+      <div class="progress-track"><span class="progress-fill" id="progressBar" style="width:66%"></span></div>
+
+      <div class="stage-chip" id="stageTag">CAMADA 02</div>
+      <p class="eyebrow" id="stageEyebrow">Segunda camada</p>
+      <h1 id="stageTitle">A segunda chave<span class="accent">.</span></h1>
+      <p class="subtitle" id="stageDescription">Uma nova camada foi ativada. Crie uma senha que cumpra todos os requisitos.</p>
+
+      <div class="challenge-box">
+        <div class="challenge-heading">REQUISITOS DA CHAVE</div>
+        <div id="rules"></div>
+      </div>
+
+      <form id="stageForm">
+        <div class="field">
+          <label for="stagePassword">Nova senha</label>
+          <input id="stagePassword" type="password" autocomplete="new-password" placeholder="Crie uma senha para esta camada" required>
+        </div>
+        <button class="primary-btn" id="stageButton" type="submit" disabled>VALIDAR CHAVE →</button>
+      </form>
+
+      <p class="message" id="stageMessage" aria-live="polite"></p>
+      <div class="terminal">
+        <span>USUÁRIO <b id="currentUser">---</b></span>
+        <button class="logout" id="logout" type="button">ENCERRAR SESSÃO</button>
+      </div>
+    </section>
+
+    <section class="panel hidden game-wrap" id="finalPanel">
+      <p class="eyebrow">Verificação concluída</p>
+      <h1>Acesso concedido<span class="accent">.</span></h1>
+      <p class="subtitle">Todas as camadas foram validadas. A sessão está liberada.</p>
+      <div class="stage-chip">AMBIENTE DESBLOQUEADO</div>
+
+      <canvas class="game-canvas" id="game" width="600" height="410" aria-label="Área interativa"></canvas>
+      <div class="game-stats">
+        <span>PONTOS: <b id="score">0</b></span>
+        <span>TEMPO: <b id="time">30</b>s</span>
+        <span>RECORDE: <b id="best">0</b></span>
+      </div>
+      <button class="primary-btn" id="playAgain" type="button">INICIAR / JOGAR NOVAMENTE</button>
+
+      <div class="terminal">
+        <span>SESSÃO <b>VERIFICADA</b></span>
+        <button class="logout" id="logoutFinal" type="button">SAIR</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
