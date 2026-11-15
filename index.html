@@ -3,106 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#070a12">
-  <meta name="description" content="Portal de autenticação PASSCODE.">
-  <title>PASSCODE // Acesso restrito</title>
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Portal institucional de acesso e cadastro.">
+  <title>Northstar — Portal de acesso</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="ambient one"></div>
-  <div class="ambient two"></div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Northstar início">
+      <span class="brand-mark">N</span>
+      <span>NORTHSTAR<span class="brand-light"> GROUP</span></span>
+    </a>
+    <span class="secure-label"><span class="status-dot"></span> PORTAL DE CLIENTES</span>
+  </header>
 
-  <main class="shell">
-    <header class="topbar">
-      <div class="brand">
-        <span class="brand-icon">⌁</span>
-        <span>PASSCODE <span class="brand-slash">//</span> PORTAL</span>
-      </div>
-      <div class="system-status">SYSTEM ONLINE</div>
-    </header>
-
-    <section class="panel" id="authPanel">
-      <p class="eyebrow">Área de autenticação</p>
-      <h1>Acesso restrito<span class="accent">.</span></h1>
-      <p class="subtitle">Crie suas credenciais ou retome uma sessão. Cada etapa exige uma nova combinação.</p>
-
-      <div class="tabs">
-        <button class="tab active" id="signupTab" type="button">Criar conta</button>
-        <button class="tab" id="loginTab" type="button">Entrar</button>
-      </div>
-
-      <form id="authForm">
-        <div class="field">
-          <label for="username">Identificador</label>
-          <input id="username" autocomplete="username" maxlength="20" placeholder="Seu nome de usuário" required>
-        </div>
-        <div class="field">
-          <label for="mainPassword">Senha principal</label>
-          <input id="mainPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Digite sua senha" required>
-        </div>
-        <button class="primary-btn" id="authButton" type="submit">INICIALIZAR CONTA →</button>
-      </form>
-
-      <p class="message" id="authMessage" aria-live="polite"></p>
-      <div class="terminal">
-        <span>CONEXÃO <b>CRIPTOGRAFADA</b></span>
-        <span>PROTOCOLO <b>v1.0.4</b></span>
-      </div>
-      <p class="small-note">Projeto demonstrativo: os dados ficam somente neste navegador. Não use senhas reais ou reutilizadas.</p>
+  <main class="layout">
+    <section class="intro">
+      <p class="eyebrow">NORTHSTAR GROUP · ÁREA DO CLIENTE</p>
+      <h1>Seu espaço.<br><span>Suas possibilidades.</span></h1>
+      <p class="intro-copy">Acesse sua conta ou crie seu cadastro para continuar. Um ambiente simples, organizado e feito para você.</p>
+      <div class="intro-line"></div>
+      <p class="intro-foot">ACESSO DIGITAL <span>·</span> EXPERIÊNCIA SEGURA</p>
     </section>
 
-    <section class="panel hidden" id="stagePanel">
-      <div class="progress-heading">
-        <span>VERIFICAÇÃO DE IDENTIDADE</span>
-        <span class="progress-count" id="progressCount">02 / 03</span>
-      </div>
-      <div class="progress-track"><span class="progress-fill" id="progressBar" style="width:66%"></span></div>
-
-      <div class="stage-chip" id="stageTag">CAMADA 02</div>
-      <p class="eyebrow" id="stageEyebrow">Segunda camada</p>
-      <h1 id="stageTitle">A segunda chave<span class="accent">.</span></h1>
-      <p class="subtitle" id="stageDescription">Uma nova camada foi ativada. Crie uma senha que cumpra todos os requisitos.</p>
-
-      <div class="challenge-box">
-        <div class="challenge-heading">REQUISITOS DA CHAVE</div>
-        <div id="rules"></div>
+    <section class="auth-card" id="authCard">
+      <div class="card-heading">
+        <p class="eyebrow" id="formEyebrow">COMECE POR AQUI</p>
+        <h2 id="formTitle">Criar sua conta</h2>
+        <p id="formDescription">Preencha seus dados para fazer seu cadastro.</p>
       </div>
 
-      <form id="stageForm">
-        <div class="field">
-          <label for="stagePassword">Nova senha</label>
-          <input id="stagePassword" type="password" autocomplete="new-password" placeholder="Crie uma senha para esta camada" required>
-        </div>
-        <button class="primary-btn" id="stageButton" type="submit" disabled>VALIDAR CHAVE →</button>
+      <div class="tabs" role="tablist" aria-label="Tipo de acesso">
+        <button class="tab active" id="signupTab" type="button" role="tab" aria-selected="true">Criar conta</button>
+        <button class="tab" id="loginTab" type="button" role="tab" aria-selected="false">Entrar</button>
+      </div>
+
+      <form id="signupForm" novalidate>
+        <label class="field">
+          <span>Nome completo</span>
+          <input id="fullName" name="name" type="text" autocomplete="name" maxlength="70" placeholder="Como podemos te chamar?" required>
+        </label>
+        <label class="field">
+          <span>E-mail</span>
+          <input id="email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="voce@exemplo.com" required>
+        </label>
+        <label class="field">
+          <span>Nome de usuário</span>
+          <input id="signupUsername" name="username" type="text" autocomplete="username" minlength="3" maxlength="20" placeholder="Escolha um usuário" required>
+        </label>
+        <label class="field">
+          <span>Senha</span>
+          <input id="signupPassword" name="password" type="password" autocomplete="new-password" minlength="6" placeholder="Mínimo de 6 caracteres" required>
+        </label>
+        <label class="field">
+          <span>Confirmar senha</span>
+          <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Digite a senha novamente" required>
+        </label>
+        <button class="submit-btn" type="submit">Criar conta <span>→</span></button>
       </form>
 
-      <p class="message" id="stageMessage" aria-live="polite"></p>
-      <div class="terminal">
-        <span>USUÁRIO <b id="currentUser">---</b></span>
-        <button class="logout" id="logout" type="button">ENCERRAR SESSÃO</button>
-      </div>
+      <form id="loginForm" class="hidden" novalidate>
+        <label class="field">
+          <span>Nome de usuário</span>
+          <input id="loginUsername" name="username" type="text" autocomplete="username" placeholder="Seu usuário" required>
+        </label>
+        <label class="field">
+          <span>Senha</span>
+          <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+        </label>
+        <button class="submit-btn" type="submit">Entrar na conta <span>→</span></button>
+      </form>
+      <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+      <p class="card-foot">Ao continuar, você concorda com os termos de uso do portal.</p>
     </section>
 
-    <section class="panel hidden game-wrap" id="finalPanel">
-      <p class="eyebrow">Verificação concluída</p>
-      <h1>Acesso concedido<span class="accent">.</span></h1>
-      <p class="subtitle">Todas as camadas foram validadas. A sessão está liberada.</p>
-      <div class="stage-chip">AMBIENTE DESBLOQUEADO</div>
-
-      <canvas class="game-canvas" id="game" width="600" height="410" aria-label="Área interativa"></canvas>
-      <div class="game-stats">
-        <span>PONTOS: <b id="score">0</b></span>
-        <span>TEMPO: <b id="time">30</b>s</span>
-        <span>RECORDE: <b id="best">0</b></span>
-      </div>
-      <button class="primary-btn" id="playAgain" type="button">INICIAR / JOGAR NOVAMENTE</button>
-
-      <div class="terminal">
-        <span>SESSÃO <b>VERIFICADA</b></span>
-        <button class="logout" id="logoutFinal" type="button">SAIR</button>
-      </div>
+    <section class="success-card hidden" id="successCard" aria-live="polite">
+      <div class="success-icon">✓</div>
+      <p class="eyebrow">CADASTRO CONCLUÍDO</p>
+      <h2>Conta criada<br>com sucesso!</h2>
+      <p class="success-copy">Seus dados foram cadastrados neste navegador. Agora você já pode entrar na sua conta.</p>
+      <button class="submit-btn" id="goLogin" type="button">Entrar <span>→</span></button>
     </section>
   </main>
+
+  <footer class="footer">
+    <span>© <span id="year"></span> NORTHSTAR GROUP</span>
+    <span>PORTAL INSTITUCIONAL</span>
+  </footer>
 </body>
 </html>
